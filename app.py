@@ -3,4 +3,5 @@ import streamlit as st
 import views
 
 views.title()
+views.form()
 
