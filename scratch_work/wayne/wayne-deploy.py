@@ -3,8 +3,8 @@ import streamlit as st
 from gsheetsdb import connect
 import numpy as np
 import pandas as pd
-import altair as alt
-import time
+import plotly.express as px
+from datetime import datetime
 
 # Create a connection object.
 conn = connect()
@@ -19,47 +19,75 @@ def run_query(query):
 sheet_url = st.secrets["public_gsheets_url"]
 rows = run_query(f'SELECT * FROM "{sheet_url}"')
 
-st.title('My Fitness Tracker')
+days = []
+weights = [] 
+
+# Print results.
+for row in rows:
+    st.write(f'User {row.UserID} lifted {row.Weight} for {row.Reps} reps!')
+    days.append(row.Date)
+    weights.append(row.ORM)
+
+user_ls = ['Wayne', 'Ian']
+
+st.title('Trkkr')
 st.subheader('Welcome back, User')
 
 # Form
 with st.form(key='my_form'):
-    weight_input = st.number_input(label='Weight (lbs): ')
-    rep_input = st.number_input(label='Reps: ')
+    uid = st.text_input(label='User ID:')
+    lift = st.radio('Lift', ['Bench Press', 'Deadlift'])
+    weight_input = st.number_input(label='Weight (lbs):')
+    rep_input = st.number_input(label='Reps:')
+    ingestion = st.radio('Ingestion', ['Real-time', 'Historical'])
     submit_button = st.form_submit_button(label='Submit')
 
-days = []
-normalized = []
+if submit_button:
+    timestamp = datetime.now()
+    st.write(f'{user_ls[int(uid)]} lifted {int(weight_input)} pounds {int(rep_input)} times for {lift} on {timestamp}.')
 
-# Print results.
-for row in rows:
-    st.write(f"On day {row.Day} {row.Fname} lifted {row.Normalize} pounds")
-    days.append(row.Day)
-    normalized.append(row.Normalize)
+    table = pd.DataFrame(columns={'% of ORM', 'Weight (lbs)', 'Reps'})
+    table = table[['% of ORM', 'Weight (lbs)', 'Reps']]
 
-@st.cache
-def normalize(weight, rep):
-    pass
+    if rep_input == 1:
+        orm = weight_input
+    else:
+        orm = weight_input*(1+(0.0333*rep_input))
 
-addPoints = st.button('Click for Gains')
+    st.caption(f'Your 1-rep max is: {orm} pounds!')
 
-chart_data = pd.DataFrame({
-    'Day': days,
-    'Normalized': normalized
-})
+    # Building graph to update new 
+    days.append(timestamp)
+    weights.append(orm)
 
-#st.line_chart(chart_data)
+    fig = px.line(x=days, y=weights, title='User Performance Summary')
+    st.plotly_chart(fig, use_container_width=True)
 
-basic_chart = alt.Chart(chart_data).mark_line().encode(
-    x='Day',
-    y='Normalized',
-).configure_line(
-    opacity=0.5,
-    color='yellow'
-).properties(
-    width=700,
-    height=500
-)
+    # New entry to write to Google Sheet
+    write = pd.DataFrame(columns={'Date', 'UserID', 'Lift', 'Weight', 'Reps', 'ORM', 'IngestionType'})
+    write = write[['Date', 'UserID', 'Lift', 'Weight', 'Reps', 'ORM', 'IngestionType']]
 
-st.altair_chart(basic_chart)
+    write = write.append({'Date': timestamp,
+                  'UserID': uid,
+                  'Lift': lift,
+                  'Weight': weight_input,
+                  'Reps': rep_input,
+                  'ORM': orm,
+                  'IngestionType': ingestion
+    }, ignore_index=True)
+
+    st.table(write)
+
+    # 1-rep max distribution table
+    pct = []
+    wt = []
+    rp = [1, 2, 4, 6, 8, 10, 12, 16, 20, 24, 30]
+    for i in range(100, 45, -5):
+        pct.append(str(i) + '%')
+        wt.append(i/100*orm)
+
+    table['% of ORM'] = pct
+    table['Weight (lbs)'] = wt
+    table['Reps'] = rp
+    st.table(table)
 
