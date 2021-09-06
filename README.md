@@ -1,12 +1,12 @@
 # Trkkr
 ## Milestones and realted tasks
 [Brainstorming Notes](https://docs.google.com/document/d/1tGIkbX_Jc_wwIDTFyM7HNC8PPHtoryvsQfFPuvLEh7Y/edit)
-- [ ] Create google form so spreadsheet can begin populating
+- [x] Create google form so spreadsheet can begin populating
   - [google form](https://forms.gle/Lj7ADpVdwV1dVyiw9)
 - [ ] Create streamlit form sot hat app can be contained to one website
 - [ ] Find out how to pull data from google spreadsheet
-  - [Public](post link here)
-  - [Private](post link here)
+  - [Public](https://docs.streamlit.io/en/stable/tutorial/public_gsheet.html)
+  - [Private](https://docs.streamlit.io/en/stable/tutorial/private_gsheet.html)
 - [ ] Figure out all types of graphs
   - List all types of graph in this list (y vs x)
   - Body Weight vs Day
