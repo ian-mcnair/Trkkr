@@ -37,7 +37,7 @@
 `git branch`
 - View which branch you are on
   
-`git pull origin master`
+`git pull origin main`
   - pulls the current master branch
   
   
