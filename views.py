@@ -1,103 +1,108 @@
 import pandas as pd
 import numpy as np
-#import plotly.express as px
+from datetime import datetime
 import streamlit as st
 import utils
 
 def welcome():
+    #utils.print_log()
     st.write(f"# Trkkr")
     st.write(f'## Welcome back, user!')
 
 def form():
-    amt = 0
-    reps = 0
+    amt = np.empty(1)
+    reps = np.empty(1)
     lift = ''
     
     # User
     uid = st.selectbox(
         'Select your user',
-        ('Ian', 'Gladys', 'Linda', 'Wayne', 'Rando')
+        (0, 1, 2, 3, 4)
     )
 
     # Attribute
-    measure = st.radio(
-        'Measurement', [
-            'Body Weight',
-            'Lifts',
-            'Running'
-        ])
-
-    if measure == 'Running':
-        amt_label = 'Distance Ran (in miles)'
-        rep_label = 'Time'
-
-        amt = st.number_input(
-            label = amt_label,
-            min_value = 0,
-            step = 1
-        )
-        reps = st.number_input(
-            label = rep_label,
-            min_value = 0,
-            step = 1
-        )
-
-    elif measure == 'Lifts':
-        amt_label = 'Weight (lbs):'
-        rep_label = 'Reps (if applicable)'
-
-        lift = st.selectbox(
-        'Lift Type',
-        ('Bench Press', 'Squat', 'Deadlift', 'Military Press')
+    attribute = st.radio(
+        'Attribute', ['Lifts', 'Body Weight', 'Running']
     )
 
+    if attribute == 'Body Weight':
+        amt_label = 'Weight (lbs)'
+        lift = 'Body Weight'
+        reps = 1
+
         amt = st.number_input(
             label = amt_label,
             min_value = 0,
-            step = 1
-        )
+            step = 1)
+
+    elif attribute == 'Lifts':
+        amt_label = 'Weight (lbs)'
+        rep_label = 'Reps'
+
+        amt = st.number_input(
+            label = amt_label,
+            min_value = 0,
+            step = 1)
+
         reps = st.number_input(
             label = rep_label,
             min_value = 0,
-            step = 1
-        )
-    else:
-        amt_label = 'Weight (lbs):'
+            step = 1)
 
-        amt = st.number_input(
+        lift = st.selectbox(
+            'Lift Type', ('Deadlift', 'Bench Press', 'Squat', 'Military Press'))
+    elif attribute == 'Running':
+        amt_label = 'Time'
+        rep_label = 'Distance Ran (in miles)'
+        lift = 'Running'
+
+        amt = st.text_input(
             label = amt_label,
+            )
+
+        reps = st.number_input(
+            label = rep_label,
             min_value = 0,
-            step = 1
-        )
+            step = 1)
 
     # Data Ingestion    
-    ingestion = st.radio('Ingestion', [
-        'Set', 'Goal'
-    ])
+    ingestion = st.radio(
+        'Ingestion', ['Set', 'Goal']
+        )
     
     # Data Submission
     submit_button = st.button('Submit Data')
-    st.write(submit_button)
 
     # Package Data into JSON
     if submit_button:
-
-        entry = {
+        
+        dt = str(datetime.now())
+        
+        if attribute == 'Lifts':
+            orm = utils.normalize(amt, reps)
+        else:
+            orm = amt
+        
+        info = {
             'uid': uid,
-            'lift': lift, 
-            'measurement': measure, 
-            'amt': amt, 
+            'datetime': dt,
+            'attribute': attribute,
+            'lift': lift,
+            'amt': str(amt),
             'reps': reps,
+            'orm': str(orm),
             'ingestion': ingestion
-        }
+            }
 
-        utils.submit_info(entry)
+        utils.submit_info(info)
 
-        if entry['measurement'] == 'Lifts' and entry['ingestion'] == 'Set':
-            orm = utils.normalize(entry['amt'], entry['reps'])
-            utils.summary_graph(entry['measurement'], orm=orm)
+        if info['attribute'] == 'Lifts' and info['ingestion'] == 'Set':
+            utils.summary_graph(info)
             utils.weight_table(orm)
-        elif entry['measurement'] == 'Running' and entry['ingestion'] == 'Set':
-            utils.summary_graph(entry['measurement'], rep=entry['reps'])
-        elif entry['measurement'] == 'Body Weight' and entry['ingestion'] == 'Set':
-            utils.summary_graph(entry['measurement'], amt=entry['amt'])
+        else:
+            pass
+
+        #utils.print_log()
+
+def goals():
+    pass
