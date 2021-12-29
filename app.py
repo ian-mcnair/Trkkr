@@ -4,3 +4,4 @@ import views
 
 views.welcome()
 views.form()
+views.goals()
