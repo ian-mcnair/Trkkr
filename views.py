@@ -1,13 +1,14 @@
+from typing import NamedTuple
 import pandas as pd
 import numpy as np
 from datetime import datetime
 import streamlit as st
+import streamlit_authenticator as stauth
 import utils
 
+
 def welcome():
-    #utils.print_log()
     st.write(f"# Trkkr")
-    st.write(f'## Welcome back, user!')
 
 def form():
     amt = np.empty(1)
@@ -15,14 +16,24 @@ def form():
     lift = ''
     
     # User
-    uid = st.selectbox(
-        'Select your user',
-        (0, 1, 2, 3, 4)
+    t = st.empty()
+    
+    t.write(f'### Welcome back, User!')
+    
+    name = st.selectbox(
+        'Who is this?',
+        ('Select User', 'Ian McNair', 'Wayne Chim')
     )
+
+    if name == 'Select User':
+        t.write(f'### Welcome back, User!')
+    else:
+        fname = name.split()[0]
+        t.write(f'### Welcome back, {fname}!')
 
     # Attribute
     attribute = st.radio(
-        'Attribute', ['Lifts', 'Body Weight', 'Running']
+        'Attribute', ['Body Weight', 'Lifts', 'Running']
     )
 
     if attribute == 'Body Weight':
