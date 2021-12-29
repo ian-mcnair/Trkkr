@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import streamlit as st
-import streamlit_authenticator as stauth
+#import streamlit_authenticator as stauth
 import utils
 
 
