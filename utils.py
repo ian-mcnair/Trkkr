@@ -4,35 +4,47 @@ import json
 import plotly.express as px
 import plotly.io as pio
 import streamlit as st
+from gsheetsdb import connect
 
 pio.templates
 
-with open('users.txt', 'r') as f:
-    users_ls = json.load(f)
+conn = connect()
+sheet_url = st.secrets['public_gsheets_url']
 
-def print_log():
-    df = pd.read_csv('dummy.csv')
-    st.table(df)
+@st.cache(ttl=600)
+def run_query(query):
+    rows = conn.execute(query, headers=1)
+    return rows
+
+def build_table():
+    rows = run_query(f'SELECT * FROM "{sheet_url}"')
+    df = pd.DataFrame(columns=['timestamp', 'user', 'wt_lb', 'wt_kg'])
+    for row in rows:
+        _ = pd.DataFrame([[row.timestamp, row.user, row.wt_lb, row.wt_kg]],
+                         columns=['timestamp', 'user', 'wt_lb', 'wt_kg'])
+        df = df.append(_, ignore_index=True)
+    return df
+
 
 # Data Submission
 #@st.cache(suppress_st_warning=True)
 def submit_info(info = []):
     df = pd.read_csv('dummy.csv')
 
-    fname = users_ls[str(info['uid'])]
 
-    if info['attribute'] == 'Body Weight':
-        st.write(f'''{fname} weighs {info['amt']} pounds!''')
+    #fname = users_ls[str(info['uid'])]
 
-    elif info['attribute'] == 'Running':
-        st.write(f'''{fname} ran {info['reps']} miles in {info['amt']} minutes!''')
+    #if info['attribute'] == 'Body Weight':
+    #    st.write(f'''{fname} weighs {info['amt']} pounds!''')
+
+    #elif info['attribute'] == 'Running':
+    #    st.write(f'''{fname} ran {info['reps']} miles in {info['amt']} minutes!''')
     
-    elif info['attribute'] == 'Lifts':
-        st.write(f'''{fname} lifted {info['amt']} pounds {info['reps']} times for {info['lift']}!''')
+    #elif info['attribute'] == 'Lifts':
+    #    st.write(f'''{fname} lifted {info['amt']} pounds {info['reps']} times for {info['lift']}!''')
     
     df = df.append(info, ignore_index=True)
     #df.to_csv('dummy.csv', index=False)
-
     st.table(df)
 
 # Calculating ORM for Lifts
