@@ -9,6 +9,7 @@ numpy = "*"
 plotly = "*"
 streamlit = "*"
 gsheetsdb = "*"
+statsmodels = "*"
 
 [dev-packages]
 
