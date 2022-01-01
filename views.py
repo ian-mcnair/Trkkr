@@ -1,3 +1,8 @@
+'''
+views.py is essentially the "frontend" while utils is the "backend". Functions in views should mostly 
+set up the layout of the application. Any othe rfunctionality can probably reside in utils or elsewhere
+'''
+
 import pandas as pd
 import numpy as np
 from datetime import datetime
@@ -5,6 +10,7 @@ import streamlit as st
 #import streamlit_authenticator as stauth
 import utils
 import time
+import plots
 
 
 def welcome():
@@ -30,20 +36,32 @@ def form():
     chart = st.empty()
 
     if name == 'Select User':
-        user_ls = df.user.value_counts().index.tolist()
-        user_df = pd.DataFrame()
-        for u_name in user_ls:
-            u_wt = df[df.user==u_name].wt_lb.tolist()
-            user_df[u_name] = u_wt
-        chart.line_chart(user_df)
+        # Wayne, please delete if you think it is unneeded -----------------------------
+        # user_ls = df.user.value_counts().index.tolist()
+        # user_df = pd.DataFrame()
+        # for u_name in user_ls:
+        #     u_wt = df[df.user==u_name].wt_lb.tolist()
+        #     user_df[u_name] = u_wt
+        st.plotly_chart(plots.general_weight(df))       
+        
+
     else:
         fname = name.split()[0]
         t.write(f'### Welcome back, {fname}!')
-        u_df = df[df.user == name]
-        u_df = u_df.reset_index()
-        chart.line_chart(u_df['wt_lb'])
+        # Wayne, please delete the below if you think it is unneeded --------------------
+        # u_df = df[df.user == name]
+        # u_df = u_df.reset_index()
+        # chart.line_chart(u_df['wt_lb'])
+        fig, slope = plots.weight(df, name)
+        st.plotly_chart(fig)
+        st.write(f'{name} is changing weight by {round(slope, 2)} per day on average')
 
+    # WE SHOULD DEF PUSH THIS (below) INTO ANOTHER FUNCTIONS MAYBE???
+    # LIKE A FORMATTING.PY FILE???? 
+    # Just seems like a lot happening and its hard to read/follow at a glance.
+    
     # Attribute
+    
     attribute = st.radio(
         'Attribute', ['Body Weight']
     )
