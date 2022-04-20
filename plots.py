@@ -2,6 +2,7 @@
 plots.py is exactly what it sounds like. It is used to put together any plot and each function should at least return a figure.
 '''
 
+from nntplib import decode_header
 import plotly.express as px
 import streamlit as st
 
@@ -28,7 +29,9 @@ def weight_track(data, user): # <- I want to add timeline as well
         }
     )
     fig.update_layout(yaxis_range=[df.wt_lb.min() - 10, df.wt_lb.max() + 10])
-    return fig, px.get_trendline_results(fig).iloc[0]['px_fit_results'].params[-1]
+    slope = px.get_trendline_results(fig).iloc[0]['px_fit_results'].params[-1]
+    slope = round(slope, 2)
+    return fig, slope
 
 def general_weight(data):
     '''
@@ -57,11 +60,15 @@ def current_weight(data, user):
     df = data[data.user == user].copy()
     df['date'] = [_.date() for _ in df.timestamp]
     today = df.date.max()
-    prev_day = today - timedelta(days=1)
-
     lb_today = df[df.date == today]['wt_lb'].values[0]
-    lb_prev = df[df.date == prev_day]['wt_lb'].values[0]
-    lb_diff = round(lb_today - lb_prev, 2)
-
     st.write('Last updated ', str(today))
-    st.metric('Day Over Day Weight Change (lbs)', lb_today, lb_diff, 'inverse')
+
+    if len(df) >= 2:
+        prev_day = df[df.date.argsort() == len(df) - 2].date.values[0]
+        lb_prev = df[df.date == prev_day]['wt_lb'].values[0]
+        lb_diff = round(lb_today - lb_prev, 2)
+
+        st.metric('Day Over Day Weight Change (lbs)', lb_today, lb_diff, 'inverse')
+    
+    else:
+        st.metric('First Weigh In (lbs)', lb_today)
