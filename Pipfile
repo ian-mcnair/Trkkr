@@ -6,10 +6,14 @@ name = "pypi"
 [packages]
 pandas = "*"
 numpy = "*"
+datetime = "*"
 plotly = "*"
 streamlit = "*"
 gsheetsdb = "*"
 statsmodels = "*"
+gspread = "*"
+oauth2client.service_account = "*"
+gspread_dataframe = "*"
 
 [dev-packages]
 
