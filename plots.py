@@ -13,9 +13,7 @@ def weight_track(data, user): # <- I want to add timeline as well
     '''
     Creates a plot based on the user (and eventually a time period)
     '''
-    df = data[
-        (data.user == user)
-    ].copy()
+    df = data[(data.user == user)].copy()
 
     fig = px.scatter(
         data_frame = df, 
@@ -53,7 +51,7 @@ def general_weight(data):
     fig.update_layout(yaxis_range=[df.wt_lb.min() - 20, df.wt_lb.max() + 10])
     return fig
 
-def current_weight(data, user):
+def day_over_day(data, user):
     '''
     Display day over day weight change for user (currently only in lbs)
     '''
@@ -61,14 +59,22 @@ def current_weight(data, user):
     df['date'] = [_.date() for _ in df.timestamp]
     today = df.date.max()
     lb_today = df[df.date == today]['wt_lb'].values[0]
-    st.write('Last updated ', str(today))
 
     if len(df) >= 2:
         prev_day = df[df.date.argsort() == len(df) - 2].date.values[0]
         lb_prev = df[df.date == prev_day]['wt_lb'].values[0]
         lb_diff = round(lb_today - lb_prev, 2)
-
-        st.metric('Day Over Day Weight Change (lbs)', lb_today, lb_diff, 'inverse')
-    
+        label = 'Day Over Day Weight Change (lbs)'
+        delta_color = 'inverse'
     else:
-        st.metric('First Weigh In (lbs)', lb_today)
+        label = 'First Weigh In (lbs)'
+        lb_diff = 0.0
+        delta_color = 'normal'
+    return label, lb_today, lb_diff, delta_color
+
+def last_updated(data, user):
+    df = data[data.user == user].copy()
+    df['date'] = [_.date() for _ in df.timestamp]
+    today = df.date.max()
+    st.write('Last updated ', str(today))
+

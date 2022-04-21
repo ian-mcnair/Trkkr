@@ -6,6 +6,7 @@ set up the layout of the application. Any other functionality can probably resid
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from datetime import timedelta
 
 import streamlit as st
 
@@ -20,31 +21,32 @@ def welcome():
     st.write(f"# Trkkr")
 
 def form():
-    weight = np.empty(1)
-
     df = utils.load_table()
 
     # User
-    t = st.empty()
-    t.write(f'### Welcome back, User!')
+    welcome_msg = st.empty()
+    welcome_msg.write(f'### Welcome back, User!')
 
     name = st.selectbox(
         'Who is this?',
-        ('Select User', 'Ian McNair', 'Wayne Chim')
+        ('Select User', 'Ian McNair', 'Wayne Chim', 'Random')
     )
 
     if name == 'Select User':
         st.plotly_chart(plots.general_weight(df))       
     else:
-        plots.current_weight(df, name)
         fname = name.split()[0]
-        t.write(f'### Welcome back, {fname}!')
+        welcome_msg.write(f'### Welcome back, {fname}!')
+
+        label, value, delta, delta_color = plots.day_over_day(df, name)
+        st.metric(label, value, delta, delta_color)
+        plots.last_updated(df, name)
+
         fig, slope = plots.weight_track(df, name)
         st.plotly_chart(fig)
         st.write(f'{name} is changing weight by {slope} per day on average')
     
     # Input fields
-
     weight = st.number_input(label = 'Weight',
                              min_value = 0.0,
                              step = 0.1)
@@ -61,7 +63,7 @@ def form():
 
     # Package Data into JSON
     if submit_button:
-        dt = str(datetime.now())
+        dt = str(datetime.now() - timedelta(hours=8))
 
         entry = {'timestamp': dt,
                  'user': name,

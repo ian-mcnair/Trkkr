@@ -15,6 +15,8 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread_dataframe as gd
 
+import format
+
 # Setting up Google Sheets Connect
 scope = ['https://spreadsheets.google.com/feeds',
          'https://www.googleapis.com/auth/drive']
@@ -31,18 +33,13 @@ values = sheet.get_all_values()
 
 main = pd.DataFrame(values[1:], columns=values[0])
 
-# Converting Timestamp from String to Datetime
-#main['timestamp'] = [datetime.strptime(timestamp, 'MM/dd/yyyy HH:mm:ss') for timestamp in main['timestamp']]
-main['timestamp'] = pd.to_datetime(main['timestamp'], infer_datetime_format=True)
-main['wt_lb'] = main['wt_lb'].astype(float)
-main['wt_kg'] = main['wt_kg'].astype(float)
-
 # Loading Data
 pio.templates
 @st.cache(ttl=600, suppress_st_warning=True)
 
 def load_table():
-    return main
+    data_table = format.for_datatable(main)
+    return data_table
 
 # Submit Form
 def submit(new_entry={}):
