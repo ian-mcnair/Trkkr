@@ -46,28 +46,28 @@ def form():
         st.plotly_chart(fig)
         st.write(f'{name} is changing weight by {slope} per day on average')
     
-    # Input fields
-    weight = st.number_input(label = 'Weight',
-                             min_value = 0.0,
-                             step = 0.1)
+        # Input fields
+        weight = st.number_input(label = 'Weight',
+                                min_value = 0.0,
+                                step = 0.1)
 
-    # Unit of Measure
-    uom = st.radio('Unit of Measure',
-                   ['Pounds', 'Kilograms'])   
+        # Unit of Measure
+        uom = st.radio('Unit of Measure',
+                    ['Pounds', 'Kilograms'])   
 
-    if weight > 0:
-        lb, kg = format.for_weight(uom, weight)
-    
-    # Data Submission
-    submit_button = st.button('Submit Data')
+        if weight > 0:
+            lb, kg = format.for_weight(uom, weight)
+        
+        # Data Submission
+        submit_button = st.button('Submit Data')
 
-    # Package Data into JSON
-    if submit_button:
-        dt = str(datetime.now() - timedelta(hours=8))
+        # Package Data into JSON
+        if submit_button:
+            dt = str(datetime.now() - timedelta(hours=4))
 
-        entry = {'timestamp': dt,
-                 'user': name,
-                 'wt_lb': lb,
-                 'wt_kg': kg}
+            entry = {'timestamp': dt,
+                    'user': name,
+                    'wt_lb': lb,
+                    'wt_kg': kg}
 
-        utils.submit(entry)
+            utils.submit(entry)

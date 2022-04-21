@@ -1,6 +1,0 @@
-uid,datetime,attribute,lift,amt,reps,orm,ingestion
-3,43:37.4,Lifts,Deadlift,265,1,265,Goal
-3,43:43.6,Lifts,Deadlift,225,4,254.97,Set
-3,48:55.0,Lifts,Deadlift,155,22,268.55,Set
-3,31:39.4,Running,Running,6:30,1,6:30,Goal
-3,2021-09-16 22:32:56.021585,Body Weight,Body Weight,150,1,150,Goal
