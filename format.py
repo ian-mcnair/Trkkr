@@ -4,7 +4,14 @@ format performs all the necessary formatting amd simplication including rounding
 '''
 
 import numpy as np
+import pandas as pd
 import streamlit as st
+
+def for_datatable(main):
+    main['timestamp'] = pd.to_datetime(main['timestamp'], infer_datetime_format=True)
+    main['wt_lb'] = main['wt_lb'].astype(float)
+    main['wt_kg'] = main['wt_kg'].astype(float)
+    return main
 
 def for_weight(uom, input):
     # uom - Unit of measure
