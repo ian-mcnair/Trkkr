@@ -29,8 +29,14 @@ def weight_track(data, user): # <- I want to add timeline as well
         }
     )
     fig.update_layout(yaxis_range=[df.wt_lb.min() - 10, df.wt_lb.max() + 10])
-    slope = px.get_trendline_results(fig).iloc[0]['px_fit_results'].params[-1]
-    slope = round(slope, 2)
+    try:
+        slope = px.get_trendline_results(fig).iloc[0]['px_fit_results'].params[-1]
+        slope = round(slope, 2)
+    except:
+        slope = 0
+
+    st.write(f'{user} is changing weight by {slope} pounds per day on average')
+
     return fig, slope
 
 def general_weight(data):
@@ -91,6 +97,7 @@ def moving_avg(data, user):
         lb_diff = round(lb_today - lb_5dma, 2)
         delta_color = 'inverse'
     else:
+        lb_5dma = 'N/A'
         lb_diff = 0.0
         delta_color = 'normal'
     label = '5-Day Moving Average (lbs)'
@@ -114,7 +121,13 @@ def leaderboard_pos(data, user):
     '''
     Display user current position on leaderboard
     '''
-    pos = data[data.User == user].index.values[0]
+    df = data[data.User == user]
+    days_since = int(df['Days Since Start'].values[0].split()[0])
+
+    if days_since == 0:
+        pos = 'N/A'
+    else:
+        pos = data[data.User == user].index.values[0]
     label = 'Leaderboard Position'
     return label, pos
     

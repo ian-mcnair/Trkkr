@@ -30,12 +30,13 @@ def form():
 
     name = st.selectbox(
         'Who is this?',
-        ('Select User', 'Ian McNair', 'Wayne Chim', 'Random')
+        ('Select User', 'Ian McNair', 'Wayne Chim')
     )
 
     if name == 'Select User':
+        st.write('###### Leaderboard')
+        st.table(leaderboard)
         st.plotly_chart(plots.general_weight(df))
-        st.table(leaderboard.style)
     else:
         fname = name.split()[0]
         welcome_msg.write(f'### Welcome back, {fname}!')
@@ -58,7 +59,6 @@ def form():
 
         fig, slope = plots.weight_track(df, name)
         st.plotly_chart(fig)
-        st.write(f'{name} is changing weight by {slope} per day on average')
 
         with st.form('weight_form', clear_on_submit=True):
             # Input fields
