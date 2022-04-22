@@ -30,7 +30,7 @@ def form():
 
     name = st.selectbox(
         'Who is this?',
-        ('Select User', 'Ian McNair', 'Wayne Chim')
+        ('Select User', 'Ian McNair', 'Wayne Chim', 'Joyce Chan')
     )
 
     if name == 'Select User':
@@ -57,8 +57,11 @@ def form():
         
         plots.last_updated(df, name)
 
-        fig, slope = plots.weight_track(df, name)
-        st.plotly_chart(fig)
+        try:
+            fig, slope = plots.weight_track(df, name)
+            st.plotly_chart(fig)
+        except:
+            pass
 
         with st.form('weight_form', clear_on_submit=True):
             # Input fields
@@ -86,6 +89,3 @@ def form():
                         'wt_kg': kg}
 
                 utils.submit(entry)
-
-def leaderboard():
-    pass
