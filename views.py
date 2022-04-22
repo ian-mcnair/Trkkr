@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from datetime import timedelta
+import time
 
 import streamlit as st
 
@@ -22,6 +23,8 @@ def welcome():
 
 def form():
     df = utils.load_table()
+    #print('First Load')
+    #print(df.iloc[-1])
     leaderboard = format.for_leaderboard(df)
 
     # User
@@ -30,7 +33,7 @@ def form():
 
     name = st.selectbox(
         'Who is this?',
-        ('Select User', 'Ian McNair', 'Wayne Chim', 'Joyce Chan')
+        ('Select User', 'Ian McNair', 'Wayne Chim', 'Joyce Chan', 'Sideman Wu')
     )
 
     if name == 'Select User':
@@ -89,3 +92,5 @@ def form():
                         'wt_kg': kg}
 
                 utils.submit(entry)
+                #print('After Submit')
+                #print(df.iloc[-1])
