@@ -36,8 +36,11 @@ main = pd.DataFrame(values[1:], columns=values[0])
 # Loading Data
 pio.templates
 #@st.cache(ttl=600, suppress_st_warning=True)
-def load_table():
-    data_table = format.for_datatable(main)
+def load_table(data=None):
+    if data is None:
+        data_table = format.for_datatable(main)
+    else:
+        data_table = format.for_datatable(data)
     return data_table
 
 # Submit Form
@@ -48,3 +51,5 @@ def submit(new_entry={}):
     with st.spinner('One moment...'):
         time.sleep(0.75)
         st.success("All done!")
+
+    return update
