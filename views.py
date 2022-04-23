@@ -23,8 +23,8 @@ def welcome():
 
 def form():
     df = utils.load_table()
-    #print('First Load')
-    #print(df.iloc[-1])
+    print('First Load')
+    print(df.iloc[-1])
     leaderboard = format.for_leaderboard(df)
 
     # User
@@ -36,6 +36,9 @@ def form():
         ('Select User', 'Ian McNair', 'Wayne Chim', 'Joyce Chan', 'Sideman Wu')
     )
 
+    metric_ph = st.empty()
+    graph_ph = st.empty()
+
     if name == 'Select User':
         st.write('###### Leaderboard')
         st.table(leaderboard)
@@ -44,25 +47,18 @@ def form():
         fname = name.split()[0]
         welcome_msg.write(f'### Welcome back, {fname}!')
 
-        col1, col2, col3, col4 = st.columns(4)
-
-        dod_label, dod_value, dod_delta, dod_delta_color = plots.day_over_day(df, name)
-        col1.metric(dod_label, dod_value, dod_delta, dod_delta_color)
-        
-        ma_label, ma_value, ma_delta, ma_delta_color = plots.moving_avg(df, name)
-        col2.metric(ma_label, ma_value, ma_delta, ma_delta_color)
-        
-        fw_label, fw_value, fw_delta, fw_delta_color = plots.first_weighin(df, name)
-        col3.metric(fw_label, fw_value, fw_delta, fw_delta_color)
-        
-        lb_label, lb_value = plots.leaderboard_pos(leaderboard, name)
-        col4.metric(lb_label, lb_value)
-        
-        plots.last_updated(df, name)
+        with metric_ph.container():
+            col1, col2, col3, col4 = st.columns(4)
+            plots.day_over_day(df, name, col1)
+            plots.moving_avg(df, name, col2)
+            plots.first_weighin(df, name, col3)
+            plots.leaderboard_pos(leaderboard, name, col4)
+            plots.last_updated(df, name)
 
         try:
             fig, slope = plots.weight_track(df, name)
-            st.plotly_chart(fig)
+            with graph_ph.container():
+                st.plotly_chart(fig)
         except:
             pass
 
@@ -91,6 +87,22 @@ def form():
                         'wt_lb': lb,
                         'wt_kg': kg}
 
-                utils.submit(entry)
-                #print('After Submit')
-                #print(df.iloc[-1])
+                df = utils.load_table(utils.submit(entry))
+                leaderboard = format.for_leaderboard(df)
+                print('After Submit')
+                print(df.iloc[-1])
+
+                metric_ph.empty()
+                graph_ph.empty()
+
+                fig, slope = plots.weight_track(df, name)
+                with graph_ph.container():
+                    st.plotly_chart(fig)
+
+                with metric_ph.container():
+                    col1, col2, col3, col4 = st.columns(4)
+                    plots.day_over_day(df, name, col1)
+                    plots.moving_avg(df, name, col2)
+                    plots.first_weighin(df, name, col3)
+                    plots.leaderboard_pos(leaderboard, name, col4)
+        
