@@ -36,7 +36,6 @@ def for_leaderboard(data):
                                 'days_since': 'Days Since Start'},
                        inplace=True)
     leaderboard.index = leaderboard.index + 1
-    #print(leaderboard)
     return leaderboard
 
 def for_weight(uom, input):
@@ -47,5 +46,4 @@ def for_weight(uom, input):
     elif uom == 'Kilograms':
         lb = round(input*2.2,2)
         kg = round(input,2)
-    #print(f'{lb} pounds or {kg} kilograms')
     return lb, kg

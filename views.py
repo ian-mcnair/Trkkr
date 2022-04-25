@@ -21,15 +21,15 @@ def welcome():
                        layout='wide')
     st.title('Trkkr')
 
-def form():
+def user():
     df = utils.load_table()
     leaderboard = format.for_leaderboard(df)
-    
-    # User
+
     welcome_msg = st.empty()
     welcome_msg.write(f'### Welcome back, User!')
 
-    name = st.selectbox('Who is this?',
+    # select user
+    user = st.selectbox('Who is this?',
                         ('Select User',
                          'Ian McNair',
                          'Wayne Chim',
@@ -39,36 +39,43 @@ def form():
     metric_ph = st.empty()
     graph_ph = st.empty()
 
-    if name == 'Select User':
-        st.write('###### Leaderboard')
+    if user == 'Select User':
+        st.subheader('Leaderboard')
         st.table(leaderboard)
         st.plotly_chart(plots.general_weight(df))
     else:
-        fname = name.split()[0]
+        fname = user.split()[0]
         welcome_msg.write(f'### Welcome back, {fname}!')
 
         with metric_ph.container():
             col1, col2, col3, col4 = st.columns(4)
-            plots.day_over_day(df, name, col1)
-            plots.moving_avg(df, name, col2)
-            plots.first_weighin(df, name, col3)
-            plots.leaderboard_pos(leaderboard, name, col4)
-            plots.last_updated(df, name)
+            plots.day_over_day(df, user, col1)
+            plots.moving_avg(df, user, col2)
+            plots.first_weighin(df, user, col3)
+            plots.leaderboard_pos(leaderboard, user, col4)
+            plots.last_updated(df, user)
 
         try:
-            fig, slope = plots.weight_track(df, name)
-            st.caption(f'{name} is changing weight by {slope} pounds per day on average')
+            fig, slope = plots.weight_track(df, user)
+            st.caption(f'{user} is changing weight by {slope} pounds per day on average')
             with graph_ph.container():
                 st.plotly_chart(fig)
         except:
             pass
 
+    return user
+
+def weight_form(user):
+    df = utils.load_table()
+    if user == 'Select User':
+        pass
+    else:
         with st.sidebar:
             with st.form('weight_form', clear_on_submit=True):
                 # Input fields
                 weight = st.number_input(label = 'Weight',
-                                        min_value = 0.0,
-                                        step = 0.1)
+                                         min_value = 0.0,
+                                         step = 0.1)
 
                 # Unit of Measure
                 uom = st.radio('Unit of Measure',
@@ -82,11 +89,36 @@ def form():
 
                 # Package Data into JSON
                 if submit_button:
+                    #dt = str(datetime.now() - timedelta(hours=4))
+                    dt = str(datetime.now())
+
+                    entry = {'timestamp': dt,
+                             'user': user,
+                             'wt_lb': lb,
+                             'wt_kg': kg}
+
+                    #st.json(entry)
+                    utils.submit(entry, df)
+
+def pushup_form(user):
+    if user == 'Select User':
+        pass
+    else:
+        with st.sidebar:
+            with st.form('pushup_form', clear_on_submit=True):
+                count = st.number_input(label='Push Ups',
+                                        min_value = 0,
+                                        step = 1)
+
+                submit_button = st.form_submit_button('Submit Data')
+
+                if submit_button:
+
                     dt = str(datetime.now() - timedelta(hours=4))
 
                     entry = {'timestamp': dt,
-                            'user': name,
-                            'wt_lb': lb,
-                            'wt_kg': kg}
+                            'user': user,
+                            'count': count}
 
-                    utils.submit(entry)
+                    st.json(entry)
+
