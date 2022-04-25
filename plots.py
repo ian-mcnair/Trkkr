@@ -36,8 +36,6 @@ def weight_track(data, user): # <- I want to add timeline as well
             slope = round(slope, 2)
         except:
             slope = 0
-        
-        st.write(f'{user} is changing weight by {slope} pounds per day on average')
         return fig, slope
 
     else:
@@ -70,7 +68,7 @@ def last_updated(data, user):
         pass
     else:
         today = df.date.max()
-        st.write('Last updated ', str(today))
+        st.caption(f'Last updated {str(today)}')
 
 def day_over_day(data, user, loc):
     '''

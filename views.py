@@ -19,22 +19,22 @@ def welcome():
     st.set_page_config(page_title='Trkkr',
                        page_icon=':muscle:',
                        layout='wide')
-    st.write(f"# Trkkr")
+    st.title('Trkkr')
 
 def form():
     df = utils.load_table()
-    print('First Load')
-    print(df.iloc[-1])
     leaderboard = format.for_leaderboard(df)
-
+    
     # User
     welcome_msg = st.empty()
     welcome_msg.write(f'### Welcome back, User!')
 
-    name = st.selectbox(
-        'Who is this?',
-        ('Select User', 'Ian McNair', 'Wayne Chim', 'Joyce Chan', 'Sideman Wu')
-    )
+    name = st.selectbox('Who is this?',
+                        ('Select User',
+                         'Ian McNair',
+                         'Wayne Chim',
+                         'Joyce Chan',
+                         'Sideman Wu'))
 
     metric_ph = st.empty()
     graph_ph = st.empty()
@@ -57,52 +57,36 @@ def form():
 
         try:
             fig, slope = plots.weight_track(df, name)
+            st.caption(f'{name} is changing weight by {slope} pounds per day on average')
             with graph_ph.container():
                 st.plotly_chart(fig)
         except:
             pass
 
-        with st.form('weight_form', clear_on_submit=True):
-            # Input fields
-            weight = st.number_input(label = 'Weight',
-                                    min_value = 0.0,
-                                    step = 0.1)
+        with st.sidebar:
+            with st.form('weight_form', clear_on_submit=True):
+                # Input fields
+                weight = st.number_input(label = 'Weight',
+                                        min_value = 0.0,
+                                        step = 0.1)
 
-            # Unit of Measure
-            uom = st.radio('Unit of Measure',
-                        ['Pounds', 'Kilograms'])   
+                # Unit of Measure
+                uom = st.radio('Unit of Measure',
+                            ['Pounds', 'Kilograms'])   
 
-            if weight > 0:
-                lb, kg = format.for_weight(uom, weight)
-            
-            # Data Submission
-            submit_button = st.form_submit_button('Submit Data')
+                if weight > 0:
+                    lb, kg = format.for_weight(uom, weight)
+                
+                # Data Submission
+                submit_button = st.form_submit_button('Submit Data')
 
-            # Package Data into JSON
-            if submit_button:
-                dt = str(datetime.now() - timedelta(hours=4))
+                # Package Data into JSON
+                if submit_button:
+                    dt = str(datetime.now() - timedelta(hours=4))
 
-                entry = {'timestamp': dt,
-                        'user': name,
-                        'wt_lb': lb,
-                        'wt_kg': kg}
+                    entry = {'timestamp': dt,
+                            'user': name,
+                            'wt_lb': lb,
+                            'wt_kg': kg}
 
-                df = utils.load_table(utils.submit(entry))
-                leaderboard = format.for_leaderboard(df)
-                print('After Submit')
-                print(df.iloc[-1])
-
-                metric_ph.empty()
-                graph_ph.empty()
-
-                fig, slope = plots.weight_track(df, name)
-                with graph_ph.container():
-                    st.plotly_chart(fig)
-
-                with metric_ph.container():
-                    col1, col2, col3, col4 = st.columns(4)
-                    plots.day_over_day(df, name, col1)
-                    plots.moving_avg(df, name, col2)
-                    plots.first_weighin(df, name, col3)
-                    plots.leaderboard_pos(leaderboard, name, col4)
-        
+                    utils.submit(entry)
