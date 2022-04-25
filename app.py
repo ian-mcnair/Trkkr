@@ -7,4 +7,6 @@ import streamlit as st
 import views
 
 views.welcome()
-views.form()
+user = views.user()
+views.weight_form(user)
+views.pushup_form(user)
