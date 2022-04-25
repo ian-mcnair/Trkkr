@@ -19,7 +19,7 @@ import format
 
 # Setting up Google Sheets Connect
 scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
+        'https://www.googleapis.com/auth/drive']
 google_key_file = 'trkkr-343522-8d5890e74f07.json'
 credentials = ServiceAccountCredentials.from_json_keyfile_name(google_key_file, scope)
 gc = gspread.authorize(credentials)
@@ -35,7 +35,7 @@ main = pd.DataFrame(values[1:], columns=values[0])
 
 # Loading Data
 pio.templates
-#@st.cache(ttl=600, suppress_st_warning=True)
+@st.cache(ttl=600, suppress_st_warning=True)
 def load_table(data=None):
     if data is None:
         data_table = format.for_datatable(main)
@@ -52,4 +52,4 @@ def submit(new_entry={}):
         time.sleep(0.75)
         st.success("All done!")
 
-    return update
+    #return update
