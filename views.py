@@ -89,8 +89,8 @@ def weight_form(user):
 
                 # Package Data into JSON
                 if submit_button:
-                    #dt = str(datetime.now() - timedelta(hours=4))
-                    dt = str(datetime.now())
+                    dt = str(datetime.now() - timedelta(hours=4))
+                    #dt = str(datetime.now())
 
                     entry = {'timestamp': dt,
                              'user': user,
